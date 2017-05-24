@@ -1,0 +1,60 @@
+<project name="o2" default="build">
+
+    <!--Increase PHP memory limit. -->
+    <property name="php.memory_limit" value="2G" override="false" />
+    <property name="phpunit.config" value="docroot/core/phpunit.xml.dist" override="true" />
+    <property name="git.github" value="github.com/animeshpatni94/Drupal8.git" />
+    <property name="git.acquia" value="shoptariffdrupal@svn-6489.devcloud.hosting.acquia.com:shoptariffdrupal.git" />
+    <property name="path.base" value="./" />
+    <resolvepath propertyName="path.base" file="${path.base}"/>
+    <resolvepath propertyName="phpunit.config" file="${phpunit.config}"/>
+    <echo level="verbose">Setting memory allocation to ${php.memory_limit}</echo>
+
+    <!-- Add environment variables to "env." namespace. -->
+    <property environment="env" />
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Preparing..." />
+        <echo msg="Increase any memory limits..." />
+        <php expression="ini_set('memory_limit', '${php.memory_limit}');" level="verbose"/>
+    </target>	
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare">
+        <echo msg="Building..." />
+        <phingcall target="phpunit" />
+        <echo msg="Setup and Run Behat...CONFIGURE THIS!" />
+        <phingcall target="checkCode" />
+        <phingcall target="phpDocs" />
+        <phingcall target="phpMD" />
+        <phingcall target="phpLoc" />
+        <echo msg="Moving docs and build logs to artifact folder" />
+        <exec command="mv docs ${path.artifact}/docs" />
+    </target>
+
+   
+
+    <!-- ============================================  -->
+    <!-- Target: deploy:dev                                -->
+    <!-- ============================================  -->
+    <target name="deploy:dev">
+        <echo msg="Deploying artifact to dev" />
+        <gitpush
+            repository="${path.base}"
+            destination="${git.acquia}"
+            refspec="release:release" tags="true" force="true" />
+    </target>
+
+
+    
+
+
+    
+
+    
+</project>
